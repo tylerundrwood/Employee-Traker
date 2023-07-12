@@ -166,3 +166,92 @@ const addRoleQuestions = () => {
               })
     })     
 }
+const addEmployeeQuestions = () => {
+    return inquirer.prompt([
+        {
+            type: "input",
+            name: "first_name",
+            message: "What is the employees first name?",
+            validate: firstNameInput => {
+                if(firstNameInput) {
+                    return true
+                } else {
+                    console.log("Please enter a first name for the employee.")
+                }
+            }
+        },
+        {
+            type: "input",
+            name: "last_name",
+            message: "What is the last name of the employee?",
+            validate: lastNameInput => {
+                if(lastNameInput) {
+                    return true
+                } else {
+                    console.log("Please input a last name for the employee.")
+                }
+            }
+        },
+    ])      .then(function(empNamesInput) {
+                let first_name = empNamesInput.first_name
+                let last_name = empNamesInput.last_name
+                db.promise().query("SELECT role_id AS title FROM employee")
+                        .then(([row, fields])=> {
+                            //console.log(row)
+                            return inquirer.prompt({
+                                type: "list", 
+                                name: "roleId",
+                                message: "What is the role of the new employee?",
+                                choices: row.filter(b => !!b.title).map(b => b.title),
+                                validate: empRoleChoice => {
+                                    if(empRoleChoice) {
+                                        return true
+                                    } else {
+                                        console.log("Please select a role for the new employee.")
+                                    }
+                                }
+                            })
+                        }).then(function(empRoleInput) {
+                            let role_id = empRoleInput.roleId
+                            db.promise().query('SELECT manager_id FROM employee')
+                                .then(([row, fields]) => {
+                                    return inquirer.prompt({
+                                        type: "list",
+                                        name: "empManager",
+                                        message: "Who manages this employee?",
+                                        choices: row.filter(c => !!c.manager_id).map(c => c.manager_id),
+                                        validate: empManagerInput => {
+                                            if(empManagerInput) {
+                                                return true
+                                            } else {
+                                                console.log("Please select a manager for new employee.")
+                                            }
+                                        }
+                                    })
+                                }).then(function(empManagerInputs) {
+                                    let manager_id = empManagerInputs.empManager
+                                    //console.log(newEmpManager)
+                                    let empValues = [
+                                        [first_name,
+                                        last_name,
+                                        manager_id,
+                                        role_id,]
+                                    ]
+                                    console.log(empValues)
+                                    db.query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?)", empValues, (err, res) => {
+                                        if(err) {
+                                            console.log(err)
+                                            return startApp()
+                                        } else {
+                                            console.log("New employee created!")
+                                            return startApp()
+                                        }
+                                    })
+                                })
+                        })
+            })
+    }
+
+    startApp()
+
+module.exports = db
