@@ -1,4 +1,4 @@
---types of departments
+
 INSERT INTO department (name)
 VALUES  
 ("Marketing"),
@@ -8,7 +8,7 @@ VALUES
 ("HR"),
 ("Management");
 
---value of the positions
+
 INSERT INTO role (title, salary, department_id)
 VALUES
 ("Marketing Employee", 75000, 1),
@@ -18,12 +18,11 @@ VALUES
 ("HR Employee", 71000, 5),
 ("Management Employee", 97000, 6);
 
---number of the employee
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
 VALUES
 ("Tyler", "Underwood", 2, 6),
 ("Adam", "Sandler", 1, 6),
 ("Chris", "Rock", 5,6),
-("Emma", "Watson" 4, 6),
+("Emma", "Watson", 4, 6),
 ("Morgan", "Freeman", 3, 6),
 ("Elon", "Musk", 6, NULL);
